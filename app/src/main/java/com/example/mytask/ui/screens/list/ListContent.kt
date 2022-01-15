@@ -21,14 +21,34 @@ import com.example.mytask.data.models.Priority
 import com.example.mytask.data.models.TodoTask
 import com.example.mytask.ui.theme.taskItemBackgroundColor
 import com.example.mytask.ui.theme.taskItemTextColor
+import com.example.mytask.util.RequestState
 
 @ExperimentalMaterialApi
 @Composable
 fun ListContent(
+    tasks: RequestState<List<TodoTask>>,
+    navigateToTaskScreen: (taskId: Int) -> Unit
+){
+    if (tasks is RequestState.Success){
+        if (tasks.data.isEmpty()){
+            EmptyContent()
+        }else{
+            DisplayTasks(
+                tasks = tasks.data,
+                navigateToTaskScreen = navigateToTaskScreen
+            )
+        }
+    }
+
+}
+
+@ExperimentalMaterialApi
+@Composable
+fun DisplayTasks(
     tasks: List<TodoTask>,
     navigateToTaskScreen: (taskId: Int) -> Unit
 ){
-    
+
     LazyColumn{
         items(
             items = tasks,
@@ -44,6 +64,7 @@ fun ListContent(
     }
 
 }
+
 
 @ExperimentalMaterialApi
 @Composable
