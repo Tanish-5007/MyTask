@@ -13,6 +13,8 @@ import com.example.mytask.ui.viewmodel.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
+@ExperimentalMaterialApi
+
 class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
