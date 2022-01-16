@@ -26,16 +26,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyTaskTheme {
-
-
                 navController = rememberNavController()
                 SetupNavigation(
                     navController = navController,
                     sharedViewModel = sharedViewModel
                 )
-
-
-
             }
         }
     }
