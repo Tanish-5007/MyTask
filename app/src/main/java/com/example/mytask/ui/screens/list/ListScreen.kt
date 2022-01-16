@@ -1,13 +1,11 @@
 package com.example.mytask.ui.screens.list
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.mytask.R
 import com.example.mytask.ui.theme.fabBackgroundColor
 import com.example.mytask.ui.viewmodel.SharedViewModel
@@ -28,6 +26,8 @@ fun ListScreen(
     val action by sharedViewModel.action
 
     val allTasks by sharedViewModel.allTasks.collectAsState()
+    val searchedTasks by sharedViewModel.searchedTasks.collectAsState()
+
     val searchAppBarState: SearchAppBarState
             by sharedViewModel.searchAppBarState
     val searchTextState: String
@@ -39,6 +39,9 @@ fun ListScreen(
         scaffoldState = scaffoldState,
         handleDatabaseActions = {
             sharedViewModel.handleDatabaseActions(action = action)
+        },
+        onUndoClicked = {
+          sharedViewModel.action.value = it
         },
         taskTitle = sharedViewModel.title.value,
         action = action
@@ -54,10 +57,13 @@ fun ListScreen(
             )
         },
         content = {
-//              ListContent(
-//                  tasks = allTasks,
-//                  navigateToTaskScreen = navigateToTaskScreen
-//              )
+              ListContent(
+                  allTasks = allTasks,
+                  searchedTasks = searchedTasks,
+                  searchAppBarState = searchAppBarState,
+                  onSwipeToDelete = ,
+                  navigateToTaskScreen = navigateToTaskScreen
+              )
         },
         floatingActionButton = {
             ListFab(navigateToTaskScreen = navigateToTaskScreen)
@@ -88,6 +94,7 @@ fun ListFab(
 fun DisplaySnackBar(
     scaffoldState: ScaffoldState,
     handleDatabaseActions: () -> Unit,
+    onUndoClicked: (Action) -> Unit,
     taskTitle: String,
     action: Action
 ){
@@ -99,11 +106,34 @@ fun DisplaySnackBar(
             scope.launch {
                 val snackBarResult = scaffoldState.snackbarHostState.showSnackbar(
                     message = "${action.name}: $taskTitle",
-                    actionLabel = "OK"
+                    actionLabel = setActionLabel(action = action)
+                )
+                undoDeletedTask(
+                    action = action,
+                    snackbarResult = snackBarResult,
+                    onUndoClicked = onUndoClicked
                 )
             }
-
         }
+    }
+}
+private fun setActionLabel(action: Action): String{
+    return if(action.name == "DELETE"){
+        "UNDO"
+    } else{
+        "OK"
+    }
+}
+private fun undoDeletedTask(
+    action: Action,
+    snackbarResult: SnackbarResult,
+    onUndoClicked: (Action) -> Unit
+){
+
+    if(snackbarResult == SnackbarResult.ActionPerformed
+        && action == Action.DELETE
+    ){
+        onUndoClicked(Action.UNDO)
     }
 
 }

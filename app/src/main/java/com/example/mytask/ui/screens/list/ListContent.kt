@@ -28,20 +28,30 @@ import com.example.mytask.ui.theme.taskItemBackgroundColor
 import com.example.mytask.ui.theme.taskItemTextColor
 import com.example.mytask.util.Action
 import com.example.mytask.util.RequestState
+import com.example.mytask.util.SearchAppBarState
 
 @ExperimentalMaterialApi
 @Composable
 fun ListContent(
-    tasks: RequestState<List<TodoTask>>,
+    allTasks: RequestState<List<TodoTask>>,
+    searchedTasks: RequestState<List<TodoTask>>,
+    searchAppBarState: SearchAppBarState
     onSwipeToDelete: (Action, TodoTask) -> Unit,
     navigateToTaskScreen: (taskId: Int) -> Unit,
 ){
-    if (tasks is RequestState.Success){
-        if (tasks.data.isEmpty()){
-            EmptyContent()
-        }else{
-            DisplayTasks(
-                tasks = tasks.data,
+    if(searchAppBarState == SearchAppBarState.TRIGGERED){
+        if(searchedTasks is RequestState.Success){
+            HandleListContent(
+                tasks = searchedTasks.data,
+                navigateToTaskScreen = navigateToTaskScreen,
+                onSwipeToDelete = onSwipeToDelete
+            )
+        }
+    }
+    else{
+        if(allTasks is RequestState.Success){
+            HandleListContent(
+                tasks = allTasks.data,
                 navigateToTaskScreen = navigateToTaskScreen,
                 onSwipeToDelete = onSwipeToDelete
             )
@@ -49,6 +59,27 @@ fun ListContent(
     }
 
 }
+
+@ExperimentalMaterialApi
+@Composable
+fun HandleListContent(
+    tasks: List<TodoTask>,
+    navigateToTaskScreen: (taskId: Int) -> Unit,
+    onSwipeToDelete: (Action, TodoTask) -> Unit
+){
+
+    if (tasks.isEmpty()){
+        EmptyContent()
+    }else{
+        DisplayTasks(
+            tasks = tasks,
+            navigateToTaskScreen = navigateToTaskScreen,
+            onSwipeToDelete = onSwipeToDelete
+        )
+    }
+
+}
+
 
 @ExperimentalMaterialApi
 @Composable
