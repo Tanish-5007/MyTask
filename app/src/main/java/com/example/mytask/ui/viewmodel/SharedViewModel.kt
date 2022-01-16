@@ -4,7 +4,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mytask.data.models.Priority
 import com.example.mytask.data.models.TodoTask
 import com.example.mytask.data.repository.DataStoreRepository
@@ -36,10 +35,20 @@ class SharedViewModel @Inject constructor(
         mutableStateOf(SearchAppBarState.CLOSED)
     val searchTextState: MutableState<String> = mutableStateOf("")
 
+    private val _sortState =
+        MutableStateFlow<RequestState<Priority>>(RequestState.Idle)
+    val sortState: StateFlow<RequestState<Priority>> = _sortState
     private val _allTasks =
         MutableStateFlow<RequestState<List<TodoTask>>>(RequestState.Idle)
     val allTasks:StateFlow<RequestState<List<TodoTask>>> = _allTasks
-    fun getAllTasks(){
+
+    init {
+        getAllTasks()
+        readSortState()
+    }
+
+
+    private fun getAllTasks(){
         _allTasks.value = RequestState.Loading
         try {
             viewModelScope.launch {
@@ -83,10 +92,8 @@ class SharedViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    private val _sortState =
-        MutableStateFlow<RequestState<Priority>>(RequestState.Idle)
-    val sortState: StateFlow<RequestState<Priority>> = _sortState
-    fun readSortState(){
+
+    private fun readSortState(){
         _sortState.value = RequestState.Loading
         try {
             viewModelScope.launch {
@@ -181,7 +188,6 @@ class SharedViewModel @Inject constructor(
 
             }
         }
-        this.action.value = Action.NO_ACTION
     }
 
     fun updateTaskField(selectedTask: TodoTask?){

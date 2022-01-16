@@ -1,5 +1,6 @@
 package com.example.mytask.ui.screens.list
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -13,18 +14,19 @@ import com.example.mytask.util.Action
 import com.example.mytask.util.SearchAppBarState
 import kotlinx.coroutines.launch
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 fun ListScreen(
+    action: Action,
     navigateToTaskScreen: (taskId: Int) -> Unit,
     sharedViewModel: SharedViewModel
 ) {
-    LaunchedEffect(key1 = true){
-        sharedViewModel.getAllTasks()
-        sharedViewModel.readSortState()
-    }
 
-    val action by sharedViewModel.action
+    
+    LaunchedEffect(key1 = action){
+        sharedViewModel.handleDatabaseActions(action = action)
+    }
 
     val allTasks by sharedViewModel.allTasks.collectAsState()
     val searchedTasks by sharedViewModel.searchedTasks.collectAsState()
@@ -42,8 +44,8 @@ fun ListScreen(
 
     DisplaySnackBar(
         scaffoldState = scaffoldState,
-        handleDatabaseActions = {
-            sharedViewModel.handleDatabaseActions(action = action)
+        onComplete = {
+            sharedViewModel.action.value = it
         },
         onUndoClicked = {
           sharedViewModel.action.value = it
@@ -72,6 +74,7 @@ fun ListScreen(
                   onSwipeToDelete = { action, todoTask ->
                       sharedViewModel.action.value = action
                       sharedViewModel.updateTaskField(selectedTask = todoTask)
+                      scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
                   } ,
                   navigateToTaskScreen = navigateToTaskScreen
               )
@@ -104,12 +107,11 @@ fun ListFab(
 @Composable
 fun DisplaySnackBar(
     scaffoldState: ScaffoldState,
-    handleDatabaseActions: () -> Unit,
+    onComplete: (Action) -> Unit,
     onUndoClicked: (Action) -> Unit,
     taskTitle: String,
     action: Action
 ){
-    handleDatabaseActions()
 
     val scope = rememberCoroutineScope()
     LaunchedEffect(key1 = action){
@@ -125,6 +127,7 @@ fun DisplaySnackBar(
                     onUndoClicked = onUndoClicked
                 )
             }
+            onComplete(Action.NO_ACTION)
         }
     }
 }

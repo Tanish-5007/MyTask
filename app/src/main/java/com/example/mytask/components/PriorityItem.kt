@@ -27,7 +27,7 @@ fun PriorityItem(priority: Priority){
             modifier = Modifier
                 .padding(start = 12.dp),
             text = priority.name,
-            style = Typography.subtitle1,
+            style = Typography.subtitle2,
             color = MaterialTheme.colors.onSurface
         )
 

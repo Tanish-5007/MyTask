@@ -1,5 +1,6 @@
 package com.example.mytask.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -11,6 +12,7 @@ import com.example.mytask.navigation.destinations.taskComposable
 import com.example.mytask.ui.viewmodel.SharedViewModel
 import com.example.mytask.util.Constants.LIST_SCREEN
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 fun SetupNavigation(
