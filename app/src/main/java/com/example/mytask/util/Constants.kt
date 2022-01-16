@@ -8,4 +8,7 @@ object Constants {
     const val LIST_SCREEN = "list/{action}"  //Route Name/Argument
     const val TASK_SCREEN = "task/{taskId}"  //Route Name/Argument
 
+    const val PREFERENCE_NAME = "todo_preferences"
+    const val PREFERENCE_KEY = "sort_state"
+
 }

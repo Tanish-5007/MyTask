@@ -35,29 +35,49 @@ import com.example.mytask.util.SearchAppBarState
 fun ListContent(
     allTasks: RequestState<List<TodoTask>>,
     searchedTasks: RequestState<List<TodoTask>>,
+    lowPriorityTasks: List<TodoTask>,
+    highPriorityTasks: List<TodoTask>,
+    sortState: RequestState<Priority>,
     searchAppBarState: SearchAppBarState,
     onSwipeToDelete: (Action, TodoTask) -> Unit,
     navigateToTaskScreen: (taskId: Int) -> Unit,
 ){
-    if(searchAppBarState == SearchAppBarState.TRIGGERED){
-        if(searchedTasks is RequestState.Success){
-            HandleListContent(
-                tasks = searchedTasks.data,
-                navigateToTaskScreen = navigateToTaskScreen,
-                onSwipeToDelete = onSwipeToDelete
-            )
+    if(sortState is RequestState.Success) {
+        when{
+            searchAppBarState == SearchAppBarState.TRIGGERED -> {
+                if (searchedTasks is RequestState.Success) {
+                    HandleListContent(
+                        tasks = searchedTasks.data,
+                        navigateToTaskScreen = navigateToTaskScreen,
+                        onSwipeToDelete = onSwipeToDelete
+                    )
+                }
+            }
+            sortState.data == Priority.NONE -> {
+                if (allTasks is RequestState.Success) {
+                    HandleListContent(
+                        tasks = allTasks.data,
+                        navigateToTaskScreen = navigateToTaskScreen,
+                        onSwipeToDelete = onSwipeToDelete
+                    )
+                }
+            }
+            sortState.data == Priority.LOW -> {
+                HandleListContent(
+                    tasks = lowPriorityTasks,
+                    navigateToTaskScreen = navigateToTaskScreen,
+                    onSwipeToDelete = onSwipeToDelete
+                )
+            }
+            sortState.data == Priority.HIGH -> {
+                HandleListContent(
+                    tasks = highPriorityTasks,
+                    navigateToTaskScreen = navigateToTaskScreen,
+                    onSwipeToDelete = onSwipeToDelete
+                )
+            }
         }
     }
-    else{
-        if(allTasks is RequestState.Success){
-            HandleListContent(
-                tasks = allTasks.data,
-                navigateToTaskScreen = navigateToTaskScreen,
-                onSwipeToDelete = onSwipeToDelete
-            )
-        }
-    }
-
 }
 
 @ExperimentalMaterialApi
@@ -97,6 +117,13 @@ fun DisplayTasks(
         ){ task ->
 
             val dismissState = rememberDismissState()
+            val dismissDirection = dismissState.dismissDirection
+            val isDismissed = dismissState.isDismissed(DismissDirection.EndToStart)
+
+            if(isDismissed && dismissDirection == DismissDirection.EndToStart){
+                onSwipeToDelete(Action.DELETE, task)
+            }
+
             val degrees by animateFloatAsState(
                 targetValue = if(dismissState.targetValue == DismissValue.Default)
                     0f
@@ -107,7 +134,7 @@ fun DisplayTasks(
             SwipeToDismiss(
                 state = dismissState,
                 directions = setOf(DismissDirection.EndToStart),
-                dismissThresholds = { FractionalThreshold(0.2f) },
+                dismissThresholds = { FractionalThreshold(0.3f) },
                 background = {
                     RedBackground(degrees = degrees)
                 },
@@ -127,15 +154,14 @@ fun RedBackground(degrees: Float){
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .background(HighPriorityColor)
             .padding(horizontal = 24.dp),
         contentAlignment = Alignment.CenterEnd
     ) {
         
         Icon(
-            modifier = Modifier
-                .rotate(degrees = degrees),
+            modifier = Modifier.rotate(degrees = degrees),
             imageVector = Icons.Filled.Delete,
             contentDescription = "Delete Icon",
             tint = Color.White
