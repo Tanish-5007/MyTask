@@ -35,7 +35,7 @@ import com.example.mytask.util.SearchAppBarState
 fun ListContent(
     allTasks: RequestState<List<TodoTask>>,
     searchedTasks: RequestState<List<TodoTask>>,
-    searchAppBarState: SearchAppBarState
+    searchAppBarState: SearchAppBarState,
     onSwipeToDelete: (Action, TodoTask) -> Unit,
     navigateToTaskScreen: (taskId: Int) -> Unit,
 ){
