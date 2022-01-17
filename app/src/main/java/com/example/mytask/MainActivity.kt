@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             MyTaskTheme {
                 navController = rememberNavController()
                 SetupNavigation(
@@ -32,6 +33,7 @@ class MainActivity : ComponentActivity() {
                     sharedViewModel = sharedViewModel
                 )
             }
+
         }
     }
 }
