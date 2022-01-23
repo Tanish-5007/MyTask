@@ -8,9 +8,12 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -25,7 +28,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.mytask.data.models.Priority
 import com.example.mytask.data.models.TodoTask
-import com.example.mytask.ui.theme.HighPriorityColor
 import com.example.mytask.ui.theme.RedBackgroundColor
 import com.example.mytask.ui.theme.taskItemBackgroundColor
 import com.example.mytask.ui.theme.taskItemTextColor
@@ -185,22 +187,37 @@ fun DisplayTasks(
 @Composable
 fun RedBackground(degrees: Float){
 
-    Box(
+    Card(
         modifier = Modifier
-            .fillMaxSize()
-            .background(RedBackgroundColor)
-            .padding(horizontal = 24.dp),
-        contentAlignment = Alignment.CenterEnd
+            .padding(
+                start = 8.dp,
+                end = 8.dp,
+                top = 4.dp,
+                bottom = 4.dp
+            )
+            .fillMaxWidth(),
+            //.height(130.dp)
+        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+        elevation = 6.dp,
     ) {
-        
-        Icon(
-            modifier = Modifier.rotate(degrees = degrees),
-            imageVector = Icons.Filled.Delete,
-            contentDescription = "Delete Icon",
-            tint = Color.White
-        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(RedBackgroundColor)
+                .padding(horizontal = 24.dp),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+
+            Icon(
+                modifier = Modifier.rotate(degrees = degrees),
+                imageVector = Icons.Filled.Delete,
+                contentDescription = "Delete Icon",
+                tint = Color.White
+            )
 
 
+        }
     }
 
 }
@@ -212,74 +229,67 @@ fun TaskItem(
     todoTask: TodoTask,
     navigateToTaskScreen: (taskId: Int) -> Unit
 ){
-
-    Surface(modifier = Modifier
-        .fillMaxWidth(),
-        color = MaterialTheme.colors.taskItemBackgroundColor,
-        shape = RectangleShape,
-        elevation = 2.dp,
-        onClick = {
-            navigateToTaskScreen(todoTask.id)
-        }
-    ) {
-
-        Column(
+        Card(
             modifier = Modifier
-                .padding(all = 12.dp)
+                .padding(
+                    start = 8.dp,
+                    end = 8.dp,
+                    top = 4.dp,
+                    bottom = 4.dp
+                )
                 .fillMaxWidth()
+                //.height(130.dp)
+                .clickable {
+                    navigateToTaskScreen(todoTask.id)
+                },
+            shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+            elevation = 6.dp,
+            backgroundColor = MaterialTheme.colors.background
         ) {
-
-            Row {
-               Text(
-                   modifier = Modifier.weight(8f),
-                   text = todoTask.title,
-                   color = MaterialTheme.colors.taskItemTextColor,
-                   style = MaterialTheme.typography.h5,
-                   fontWeight = FontWeight.Bold,
-                   maxLines = 1
-               )
-                Box(modifier = Modifier
+            Column(
+                modifier = Modifier
+                    .padding(all = 12.dp)
                     .fillMaxWidth()
-                    .weight(1f),
-                    contentAlignment = Alignment.TopEnd
-                ){
-                    Canvas(
-                        modifier = Modifier
-                            .width(16.dp)
-                            .height(16.dp)
+            ) {
+
+                Row {
+                    Text(
+                        modifier = Modifier.weight(8f),
+                        text = todoTask.title,
+                        color = MaterialTheme.colors.taskItemTextColor,
+                        style = MaterialTheme.typography.h5,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                        contentAlignment = Alignment.TopEnd
                     ){
-                        drawCircle(
-                            color = todoTask.priority.color
-                        )
+                        Canvas(
+                            modifier = Modifier
+                                .width(16.dp)
+                                .height(16.dp)
+                        ){
+                            drawCircle(
+                                color = todoTask.priority.color
+                            )
+                        }
                     }
                 }
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = todoTask.description,
+                    color = MaterialTheme.colors.taskItemTextColor,
+                    style = MaterialTheme.typography.subtitle1,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = todoTask.description,
-                color = MaterialTheme.colors.taskItemTextColor,
-                style = MaterialTheme.typography.subtitle1,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
         }
 
-    }
+
+
+
 
 }
-
-//@ExperimentalMaterialApi
-//@Preview
-//@Preview(uiMode = UI_MODE_NIGHT_YES, showSystemUi = true)
-//@Composable
-//fun TaskItemPreview(){
-//    TaskItem(
-//        todoTask = TodoTask(
-//            0,
-//            "Hello",
-//            "Long ass description which sucks and i hate tying random shit just to get maximum value so please fuck off",
-//            Priority.HIGH
-//        ),
-//        navigateToTaskScreen = {}
-//    )
-//}
